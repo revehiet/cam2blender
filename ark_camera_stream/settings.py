@@ -67,10 +67,10 @@ class ARKitCameraSettings(bpy.types.PropertyGroup):
     roll_offset: bpy.props.FloatProperty(
         name="Roll Offset (deg)",
         description=(
-            "Manual rotation around the camera's local Z axis to correct "
-            "the orientation if the image appears rolled"
+            "Rotation around the camera's local Z axis. ARKit poses arrive "
+            "90 degrees rolled, so the default is 90; adjust to override"
         ),
-        default=0.0,
+        default=90.0,
         min=-180.0,
         max=180.0,
     )
