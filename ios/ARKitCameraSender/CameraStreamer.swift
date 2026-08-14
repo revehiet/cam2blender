@@ -14,7 +14,7 @@ import QuartzCore
 ///   "iw": <width>, "ih": <height>,  // image resolution in pixels
 ///   "zoom": <float>                 // digital zoom multiplier
 /// }
-final class CameraStreamer: NSObject, ObservableObject {
+final class CameraStreamer: NSObject, ObservableObject, ARSessionDelegate {
     @Published private(set) var isStreaming = false
     @Published var trackingText = "Idle"
 
