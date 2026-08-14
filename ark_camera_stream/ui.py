@@ -16,11 +16,29 @@ class ARKITCAM_PT_panel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        props = context.scene.arkitcam
+        settings = context.scene.arkitcam
         streaming = session.is_streaming()
-        stats = session.get_stats()
 
-        box = layout.box()
+        self._draw_status(layout.box(), streaming)
+
+        layout.separator()
+        layout.prop_search(settings, "target_camera", context.scene, "objects", text="Camera")
+
+        layout.separator()
+        self._draw_settings(layout.box(), settings)
+
+        layout.separator()
+        self._draw_actions(layout.box(), settings)
+
+        layout.separator()
+        if streaming:
+            layout.operator("arkitcam.stop", text="Stop Streaming", icon="PAUSE")
+        else:
+            layout.operator("arkitcam.start", text="Start Streaming", icon="PLAY")
+
+    @staticmethod
+    def _draw_status(box, streaming):
+        stats = session.get_stats()
         col = box.column(align=True)
         if streaming:
             col.label(text="Status: streaming", icon="PLAY")
@@ -35,17 +53,29 @@ class ARKITCAM_PT_panel(bpy.types.Panel):
         else:
             col.label(text="Status: stopped", icon="PAUSE")
 
-        layout.separator()
-        layout.prop_search(props, "target_camera", context.scene, "objects", text="Camera")
-        layout.prop(props, "record")
+    @staticmethod
+    def _draw_settings(box, settings):
+        box.label(text="Settings", icon="SETTINGS")
+        col = box.column(align=True)
+        col.prop(settings, "host")
+        col.prop(settings, "port")
+        col.separator()
+        col.prop(settings, "scale")
+        col.prop(settings, "sensor_width_mm")
+        col.prop(settings, "smoothing")
+        col.separator()
+        col.prop(settings, "orientation")
+        col.prop(settings, "fit_resolution")
 
-        layout.separator()
-        if streaming:
-            layout.operator("arkitcam.stop", text="Stop Streaming", icon="PAUSE")
-        else:
-            layout.operator("arkitcam.start", text="Start Streaming", icon="PLAY")
-        layout.operator(
-            "preferences.addon_show",
-            text="Connection Settings",
-            icon="PREFERENCES",
-        ).module = __package__
+    @staticmethod
+    def _draw_actions(box, settings):
+        row = box.row(align=True)
+        row.label(text="Actions", icon="ACTION")
+        row.operator("arkitcam.open_action_editor", text="", icon="DOPESHEET")
+        target = session.resolve_target_camera()
+        if target is not None and target.animation_data is not None:
+            action = target.animation_data.action
+            if action is not None:
+                box.label(text=f"Current: {action.name}")
+        box.prop(settings, "new_action_on_start")
+        box.prop(settings, "record")

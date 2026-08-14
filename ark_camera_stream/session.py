@@ -68,6 +68,8 @@ def start_stream(host, port):
     _reset_recording()
     _stats.update(started=time.time(), packets=0, malformed=0, last_packet=0.0)
 
+    settings = _get_settings()
+
     listener = network.UDPCameraListener(host or "0.0.0.0", port, _on_datagram)
     try:
         listener.start()
@@ -75,6 +77,12 @@ def start_stream(host, port):
         raise RuntimeError(f"Could not bind UDP {host}:{port} - {exc}") from exc
 
     _listener = listener
+
+    target = resolve_target_camera()
+    if target is not None:
+        if settings is not None and settings.new_action_on_start:
+            _assign_new_action(target)
+
     _timer = bpy.app.timers.register(_apply_tick, first_interval=_TICK)
 
 
@@ -119,9 +127,11 @@ def _on_datagram(data):
 # --------------------------------------------------------------------------- #
 
 
-def _get_preferences():
-    addon = bpy.context.preferences.addons.get(__package__)
-    return addon.preferences if addon is not None else None
+def _get_settings():
+    try:
+        return bpy.context.scene.arkitcam
+    except AttributeError:
+        return None
 
 
 def _apply_tick():
@@ -139,7 +149,7 @@ def _apply_tick():
 def _apply_latest():
     global _smooth_pos, _smooth_quat
 
-    prefs = _get_preferences()
+    prefs = _get_settings()
     scale = prefs.scale if prefs else 1.0
     sensor_mm = prefs.sensor_width_mm if prefs else 36.0
     smoothing = prefs.smoothing if prefs else 0.0
@@ -174,6 +184,7 @@ def _apply_latest():
     if lens is not None and lens > 0.0:
         target.data.lens = lens
 
+    _apply_render_resolution(prefs, frame)
     _record_frame(target, frame, lens)
 
 
@@ -208,6 +219,34 @@ def _record_frame(target, frame, lens):
     target.keyframe_insert(data_path="rotation_quaternion", frame=frame_number)
     if lens is not None:
         target.data.keyframe_insert(data_path="lens", frame=frame_number)
+
+
+def _apply_render_resolution(settings, frame):
+    """Match the render resolution to the iPhone image aspect ratio."""
+    if settings is None or not settings.fit_resolution:
+        return
+    if not frame.image_width or not frame.image_height:
+        return
+    x = int(round(frame.image_width))
+    y = int(round(frame.image_height))
+    if settings.orientation == "VERTICAL":
+        x, y = y, x
+    render = bpy.context.scene.render
+    if (render.resolution_x, render.resolution_y) != (x, y):
+        render.resolution_x = x
+        render.resolution_y = y
+
+
+def _assign_new_action(target):
+    """Create a new numbered action (ARKCam.1, ARKCam.2, ...) on the camera."""
+    index = 1
+    while f"ARKCam.{index}" in bpy.data.actions:
+        index += 1
+    action = bpy.data.actions.new(f"ARKCam.{index}")
+    if target.animation_data is None:
+        target.animation_data_create()
+    target.animation_data.action = action
+    return action
 
 
 # --------------------------------------------------------------------------- #

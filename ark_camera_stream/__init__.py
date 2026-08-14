@@ -7,7 +7,7 @@ Blender 4.x and 5.x.
 
 import bpy
 
-from . import conversion, network, operators, preferences, protocol, session, ui  # noqa: F401
+from . import conversion, network, operators, protocol, session, settings, ui  # noqa: F401
 
 bl_info = {
     "name": "ARKit Camera Stream",
@@ -16,34 +16,17 @@ bl_info = {
         "(position, rotation and focal length)."
     ),
     "author": "ARKit Camera Stream",
-    "version": (1, 0, 0),
+    "version": (1, 1, 0),
     "blender": (4, 0, 0),
     "location": "3D Viewport > Sidebar > ARKit Cam",
     "category": "3D View",
 }
 
-
-class ARKITCAM_SceneProps(bpy.types.PropertyGroup):
-    bl_idname = "ARKITCAM_SceneProps"
-
-    target_camera: bpy.props.PointerProperty(
-        name="Target Camera",
-        type=bpy.types.Object,
-        poll=lambda self, obj: obj.type == "CAMERA",
-        description="Camera driven by the stream (empty = active scene camera)",
-    )
-    record: bpy.props.BoolProperty(
-        name="Record Keyframes",
-        description="Write location, rotation and lens keyframes while streaming",
-        default=False,
-    )
-
-
 _CLASSES = (
-    ARKITCAM_SceneProps,
-    preferences.ARKitCameraPreferences,
+    settings.ARKitCameraSettings,
     operators.ARKITCAM_OT_start,
     operators.ARKITCAM_OT_stop,
+    operators.ARKITCAM_OT_open_action_editor,
     ui.ARKITCAM_PT_panel,
 )
 
@@ -51,7 +34,7 @@ _CLASSES = (
 def register():
     for cls in _CLASSES:
         bpy.utils.register_class(cls)
-    bpy.types.Scene.arkitcam = bpy.props.PointerProperty(type=ARKITCAM_SceneProps)
+    bpy.types.Scene.arkitcam = bpy.props.PointerProperty(type=settings.ARKitCameraSettings)
     bpy.app.handlers.load_pre.append(_stop_on_load)
 
 

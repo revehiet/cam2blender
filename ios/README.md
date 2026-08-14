@@ -106,8 +106,9 @@ sign a handful of apps at once).
    e.g. `192.168.68.56`) and port `60400`.
 4. Tap **Start Streaming** — the live camera preview appears at the top of
    the app — move the phone and the Blender camera follows.
-5. Use the **Digital zoom** slider to change the focal length sent to Blender
-   (it scales the scene camera's Lens value; the preview stays unzoomed).
+5. Zoom with the **pinch gesture** on the preview (or the slider) — it scales
+   the focal length sent to Blender (the preview stays optically unzoomed).
+   Tap the expand button on the preview for a full-screen camera view.
 
 ### If the camera doesn't move
 
