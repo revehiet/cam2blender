@@ -54,6 +54,26 @@ class ARKitCameraSettings(bpy.types.PropertyGroup):
         max=1.0,
         subtype="FACTOR",
     )
+    floor_height: bpy.props.FloatProperty(
+        name="Floor Height",
+        description=(
+            "Vertical offset added to the camera position on world Z "
+            "(scene units, applied after the position scale)"
+        ),
+        default=0.0,
+        soft_min=-10.0,
+        soft_max=10.0,
+    )
+    roll_offset: bpy.props.FloatProperty(
+        name="Roll Offset (deg)",
+        description=(
+            "Manual rotation around the camera's local Z axis to correct "
+            "the orientation if the image appears rolled"
+        ),
+        default=0.0,
+        min=-180.0,
+        max=180.0,
+    )
     orientation: bpy.props.EnumProperty(
         name="Orientation",
         description=(

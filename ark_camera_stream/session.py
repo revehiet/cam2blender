@@ -79,6 +79,8 @@ def start_stream(host, port):
     _listener = listener
 
     target = resolve_target_camera()
+    if target is None:
+        target = _create_camera()
     if target is not None:
         if settings is not None and settings.new_action_on_start:
             _assign_new_action(target)
@@ -166,7 +168,12 @@ def _apply_latest():
         return
 
     pos = conversion.position_to_blender(frame.position) * scale
+    if prefs is not None and prefs.floor_height:
+        pos.z += prefs.floor_height
+
     quat = conversion.quaternion_to_blender(frame.quaternion)
+    if prefs is not None and prefs.roll_offset:
+        quat = conversion.apply_roll(quat, prefs.roll_offset)
 
     if smoothing > 0.0 and _smooth_pos is not None:
         _smooth_pos = _smooth_pos.lerp(pos, smoothing)
@@ -235,6 +242,16 @@ def _apply_render_resolution(settings, frame):
     if (render.resolution_x, render.resolution_y) != (x, y):
         render.resolution_x = x
         render.resolution_y = y
+
+
+def _create_camera():
+    """Create and return a camera when the scene has none."""
+    scene = bpy.context.scene
+    cam_data = bpy.data.cameras.new("ARKitCam")
+    cam_obj = bpy.data.objects.new("ARKitCam", cam_data)
+    scene.collection.objects.link(cam_obj)
+    scene.camera = cam_obj
+    return cam_obj
 
 
 def _assign_new_action(target):

@@ -52,3 +52,12 @@ def focal_length_mm(fx_pixels, image_width_pixels, zoom, sensor_width_mm):
     if fx <= 0.0 or width <= 0.0:
         return None
     return fx * float(zoom) * float(sensor_width_mm) / width
+
+
+def apply_roll(quaternion, degrees):
+    """Rotate the camera around its own viewing axis (local Z)."""
+    if not degrees:
+        return quaternion
+    half = math.radians(degrees) / 2.0
+    roll = Quaternion((math.cos(half), 0.0, 0.0, math.sin(half)))
+    return quaternion @ roll

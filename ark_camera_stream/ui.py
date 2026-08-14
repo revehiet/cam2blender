@@ -32,6 +32,10 @@ class ARKITCAM_PT_panel(bpy.types.Panel):
         layout.prop_search(settings, "target_camera", context.scene, "objects", text="Camera")
 
         layout.separator()
+        layout.prop(settings, "floor_height")
+        layout.prop(settings, "roll_offset")
+
+        layout.separator()
         self._draw_actions(layout.box(), settings)
 
     @staticmethod
