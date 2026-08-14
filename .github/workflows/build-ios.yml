@@ -1,0 +1,44 @@
+name: Build iOS IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build-ipa:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build the app (unsigned)
+        run: |
+          xcodebuild \
+            -project ARKitCameraSender.xcodeproj \
+            -scheme ARKitCameraSender \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          cp -R "DerivedData/Build/Products/Release-iphoneos/ARKitCameraSender.app" Payload/
+          ditto -c -k --keepParent Payload ARKitCameraSender.ipa
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ARKitCameraSender-unsigned
+          path: ARKitCameraSender.ipa
+          retention-days: 7

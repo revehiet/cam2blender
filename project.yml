@@ -1,0 +1,31 @@
+name: ARKitCameraSender
+options:
+  bundleIdPrefix: com.arkitcam
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+targets:
+  ARKitCameraSender:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: ios/ARKitCameraSender
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.arkitcam.ARKitCameraSender
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_NSCameraUsageDescription: "Streams camera pose to Blender over your local network"
+        INFOPLIST_KEY_NSLocalNetworkUsageDescription: "Connects to the Blender PC on your local network"
+schemes:
+  ARKitCameraSender:
+    build:
+      targets:
+        ARKitCameraSender: all
+    run:
+      config: Debug

@@ -1,0 +1,15 @@
+# Generated Xcode project (XcodeGen creates it from project.yml on CI)
+*.xcodeproj
+
+# Build outputs
+build/
+DerivedData/
+Payload/
+*.ipa
+
+# Addon package (regenerated with Compress-Archive)
+ark_camera_stream_1.0.0.zip
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
