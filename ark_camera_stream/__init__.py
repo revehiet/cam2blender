@@ -16,7 +16,7 @@ bl_info = {
         "(position, rotation and focal length)."
     ),
     "author": "ARKit Camera Stream",
-    "version": (1, 1, 0),
+    "version": (1, 1, 1),
     "blender": (4, 0, 0),
     "location": "3D Viewport > Sidebar > ARKit Cam",
     "category": "3D View",
@@ -28,6 +28,7 @@ _CLASSES = (
     operators.ARKITCAM_OT_stop,
     operators.ARKITCAM_OT_open_action_editor,
     ui.ARKITCAM_PT_panel,
+    ui.ARKITCAM_PT_settings,
 )
 
 

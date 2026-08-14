@@ -21,20 +21,18 @@ class ARKITCAM_PT_panel(bpy.types.Panel):
 
         self._draw_status(layout.box(), streaming)
 
-        layout.separator()
-        layout.prop_search(settings, "target_camera", context.scene, "objects", text="Camera")
-
-        layout.separator()
-        self._draw_settings(layout.box(), settings)
-
-        layout.separator()
-        self._draw_actions(layout.box(), settings)
-
+        # Controls first, so they stay visible on short screens.
         layout.separator()
         if streaming:
             layout.operator("arkitcam.stop", text="Stop Streaming", icon="PAUSE")
         else:
             layout.operator("arkitcam.start", text="Start Streaming", icon="PLAY")
+
+        layout.separator()
+        layout.prop_search(settings, "target_camera", context.scene, "objects", text="Camera")
+
+        layout.separator()
+        self._draw_actions(layout.box(), settings)
 
     @staticmethod
     def _draw_status(box, streaming):
@@ -54,20 +52,6 @@ class ARKITCAM_PT_panel(bpy.types.Panel):
             col.label(text="Status: stopped", icon="PAUSE")
 
     @staticmethod
-    def _draw_settings(box, settings):
-        box.label(text="Settings", icon="SETTINGS")
-        col = box.column(align=True)
-        col.prop(settings, "host")
-        col.prop(settings, "port")
-        col.separator()
-        col.prop(settings, "scale")
-        col.prop(settings, "sensor_width_mm")
-        col.prop(settings, "smoothing")
-        col.separator()
-        col.prop(settings, "orientation")
-        col.prop(settings, "fit_resolution")
-
-    @staticmethod
     def _draw_actions(box, settings):
         row = box.row(align=True)
         row.label(text="Actions", icon="ACTION")
@@ -79,3 +63,28 @@ class ARKITCAM_PT_panel(bpy.types.Panel):
                 box.label(text=f"Current: {action.name}")
         box.prop(settings, "new_action_on_start")
         box.prop(settings, "record")
+
+
+class ARKITCAM_PT_settings(bpy.types.Panel):
+    """Collapsible settings section (Blender 4.0+ subpanel)."""
+
+    bl_label = "Settings"
+    bl_idname = "ARKITCAM_PT_settings"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_parent_id = "ARKITCAM_PT_panel"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        layout = self.layout
+        settings = context.scene.arkitcam
+        col = layout.column(align=True)
+        col.prop(settings, "host")
+        col.prop(settings, "port")
+        col.separator()
+        col.prop(settings, "scale")
+        col.prop(settings, "sensor_width_mm")
+        col.prop(settings, "smoothing")
+        col.separator()
+        col.prop(settings, "orientation")
+        col.prop(settings, "fit_resolution")
