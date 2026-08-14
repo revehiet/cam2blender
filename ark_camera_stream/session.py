@@ -251,6 +251,11 @@ def _create_camera():
     cam_obj = bpy.data.objects.new("ARKitCam", cam_data)
     scene.collection.objects.link(cam_obj)
     scene.camera = cam_obj
+    try:
+        scene.arkitcam.target_camera = cam_obj
+    except AttributeError:
+        pass
+    bpy.context.view_layer.objects.active = cam_obj
     return cam_obj
 
 

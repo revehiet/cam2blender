@@ -16,7 +16,7 @@ bl_info = {
         "(position, rotation and focal length)."
     ),
     "author": "ARKit Camera Stream",
-    "version": (1, 2, 1),
+    "version": (1, 2, 2),
     "blender": (4, 0, 0),
     "location": "3D Viewport > Sidebar > ARKit Cam",
     "category": "3D View",
