@@ -71,7 +71,7 @@ class ARKITCAM_PT_panel(bpy.types.Panel):
     def _draw_actions(box, settings):
         row = box.row(align=True)
         row.label(text="Actions", icon="ACTION")
-        row.operator("arkitcam.open_action_editor", text="", icon="DOPESHEET")
+        row.operator("arkitcam.open_action_editor", text="", icon="ACTION")
         target = session.resolve_target_camera()
         if target is not None and target.animation_data is not None:
             action = target.animation_data.action
