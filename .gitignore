@@ -7,8 +7,8 @@ DerivedData/
 Payload/
 *.ipa
 
-# Addon package (regenerated with Compress-Archive)
-ark_camera_stream_1.0.0.zip
+# Addon packages (regenerated with Compress-Archive)
+ark_camera_stream*.zip
 
 # OS / editor noise
 .DS_Store
