@@ -64,8 +64,9 @@ auto-refresh over Wi-Fi while the PC is on). A paid Apple Developer account
 
 ## Info.plist keys (mandatory)
 
-Route A injects these automatically via `project.yml`. For Route B, add them
-in the target settings, **Info** tab:
+Both routes ship a static `ios/Info.plist` with these keys (Route A wires it
+up through `project.yml`; for Route B copy the file into your Xcode project
+or add the keys in the target's Info tab):
 
 | Key | Value |
 | --- | --- |
@@ -101,7 +102,21 @@ sign a handful of apps at once).
 
 1. Start the Blender addon ("Start Streaming") on the PC.
 2. Allow the inbound UDP port through the PC firewall (see the root README).
-3. Enter the **Blender PC's LAN IP** (e.g. `192.168.0.10`) and port `60400`.
-4. Tap **Start Streaming**, move the phone — the Blender camera follows.
+3. Enter the **Blender PC's LAN IP** (find it with `ipconfig` on Windows,
+   e.g. `192.168.68.56`) and port `60400`.
+4. Tap **Start Streaming** — the live camera preview appears at the top of
+   the app — move the phone and the Blender camera follows.
 5. Use the **Digital zoom** slider to change the focal length sent to Blender
-   (it scales the scene camera's Lens value).
+   (it scales the scene camera's Lens value; the preview stays unzoomed).
+
+### If the camera doesn't move
+
+- On first start the app asks for **Camera** and **Local Network** access —
+  accept both prompts.
+- If the local-network prompt never appeared: Settings → Privacy & Security →
+  Local Network → switch the app ON. If it isn't listed there, delete and
+  reinstall the app (privacy state resets on reinstall).
+- The IP field must be the **PC's LAN IP**, not the router's address.
+- The PC firewall must allow inbound UDP 60400 (see the root README).
+- In Blender's panel the **Packets** counter should climb to ~60/s while
+  streaming.

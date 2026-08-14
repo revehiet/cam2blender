@@ -1,6 +1,7 @@
 import Foundation
 import Network
 import ARKit
+import RealityKit
 import QuartzCore
 
 /// Streams ARKit camera pose and lens data to the Blender addon over UDP.
@@ -18,28 +19,34 @@ final class CameraStreamer: NSObject, ObservableObject, ARSessionDelegate {
     @Published private(set) var isStreaming = false
     @Published var trackingText = "Idle"
 
-    /// Digital zoom: multiplies the focal length sent to Blender.
-    @Published var zoom: Double = 1.0 {
-        didSet { zoom = min(max(zoom, 0.1), 10.0) }
-    }
+    /// Digital zoom multiplier applied to the focal length sent to Blender.
+    @Published var zoom: Double = 1.0
 
-    private let session = ARSession()
+    private weak var arView: ARView?
     private var connection: NWConnection?
-    private var host = ""
-    private var port: UInt16 = 0
     private var lastSent: CFTimeInterval = 0
+
+    var session: ARSession? { arView?.session }
+
+    /// Called by the camera preview once it exists; we become the delegate
+    /// of its session and receive frames from it.
+    func attach(to arView: ARView) {
+        self.arView = arView
+        arView.session.delegate = self
+    }
 
     // MARK: - Lifecycle
 
     func start(host: String, port: UInt16) {
         stop()
-        self.host = host
-        self.port = port
+        guard let session = arView?.session else {
+            trackingText = "Camera unavailable"
+            return
+        }
         lastSent = 0
         trackingText = "Connecting..."
 
         let configuration = ARWorldTrackingConfiguration()
-        session.delegate = self
         session.run(configuration)
 
         let connection = NWConnection(
@@ -67,7 +74,7 @@ final class CameraStreamer: NSObject, ObservableObject, ARSessionDelegate {
     func stop() {
         connection?.cancel()
         connection = nil
-        session.pause()
+        session?.pause()
         isStreaming = false
         trackingText = "Stopped"
     }
@@ -95,6 +102,7 @@ final class CameraStreamer: NSObject, ObservableObject, ARSessionDelegate {
         let fy = intrinsics.columns.1.y
         let width = Float(frame.camera.imageResolution.width)
         let height = Float(frame.camera.imageResolution.height)
+        let clampedZoom = min(max(zoom, 0.1), 10.0)
 
         let payload: [String: Any] = [
             "v": 1,
@@ -106,7 +114,7 @@ final class CameraStreamer: NSObject, ObservableObject, ARSessionDelegate {
             "fy": fy,
             "iw": width,
             "ih": height,
-            "zoom": zoom,
+            "zoom": clampedZoom,
         ]
 
         guard let data = try? JSONSerialization.data(withJSONObject: payload) else {

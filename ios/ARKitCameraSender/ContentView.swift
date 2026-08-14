@@ -2,12 +2,18 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var streamer = CameraStreamer()
-    @State private var host = "192.168.0.10"
+    @State private var host = "192.168.68.56"
     @State private var port = "60400"
 
     var body: some View {
         NavigationView {
             Form {
+                Section {
+                    CameraPreviewView(streamer: streamer)
+                        .frame(height: 240)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .listRowInsets(EdgeInsets())
+                }
                 Section("Connection (Blender PC)") {
                     TextField("IP address", text: $host)
                         .textInputAutocapitalization(.never)
@@ -19,9 +25,12 @@ struct ContentView: View {
                 Section("Lens / Zoom") {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(String(format: "Digital zoom: %.2f", streamer.zoom) + "x")
-                        Slider(value: $streamer.zoom, in: 0.1...10.0)
+                        Slider(value: Binding(
+                            get: { streamer.zoom },
+                            set: { streamer.zoom = min(max($0, 0.1), 10.0) }
+                        ), in: 0.1...10.0)
                     }
-                    Text("Zoom multiplies the focal length sent to Blender, which changes the scene camera's Lens value.")
+                    Text("Zoom multiplies the focal length sent to Blender, which changes the scene camera's Lens value. The preview stays unzoomed.")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
